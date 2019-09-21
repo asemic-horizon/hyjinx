@@ -1,6 +1,6 @@
 from setuptools import setup
 
-setup(name='Hyjinx',
+setup(name='hyjinx',
       version='0.01',
       description="dnavarro's Hy utility functions and macros",
       author='Diego Navarro',
