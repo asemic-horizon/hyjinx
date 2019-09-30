@@ -1,3 +1,35 @@
+;; syntax diabetes
+(defmacro incf [var] `(setv ~var (inc ~var)))
+(defmacro get-0 [x] `(get ~x 0))
+(defmacro get-1 [x] `(get ~x 1))
+(defmacro get-2 [x] `(get ~x 2))
+(defmacro get-3 [x] `(get ~x 3))
+;; dict inversion
+(defn cod [lista] (dfor [u v] (enumerate lista) [v u]))
+
+;; for numpy arrays
+(defmacro hlen [x] `(get-0 (.shape ~x)))
+(defmacro vlen [x] `(get-1 (.shape ~x)))
+
+;; make object attrs less annoying to type and read
+(deftag << [name] `(getattr self (str ~name)))
+(deftag >= [name value] `(setattr self (str ~name) ~value))
+
+;; makeshift onehot-ecoding
+;; makes a dictionary from a list, pd.series etc.
+(defn encoding [df col]
+ (setv values  (get df col)  
+       uniques (list (set values)))
+ (dict (zip uniques (range (len uniques)))))
+
+;; applies an encoding to a pd.series or np.ndarray
+(defn encode [df col corresp] 
+ (import [numpy [vectorize]]) 
+ ((vectorize (fn [x] (get corresp (str x))))
+  (getattr (get df col) "values"))) 
+
+
+;;; overly specific figure macros, should rethink sometime soon
 (defmacro insert-ax [body] 
    `((getattr g!ax (str '~(first body))) ~@(rest body)))
 
@@ -69,25 +101,3 @@
    (when ~title  (.set-title g!ax ~title))
    (.savefig g!fig (if ~title ~title (ctime)))))
    
-
-(defmacro get-0 [x] `(get ~x 0))
-(defmacro get-1 [x] `(get ~x 0))
-(defmacro get-2 [x] `(get ~x 0))
-(defmacro get-3 [x] `(get ~x 3))
-
-;; for numpy arrays
-(defmacro hlen [x] `(get (.shape ~x) 1))
-(defmacro vlen [x] `(get (.shape ~x)))
-
-
-(defn encoding [df col]
- (setv values  (get df col)  
-       uniques (list (set values)))
- (dict (zip uniques (range (len uniques)))))
-
-(defn encode [df col corresp] 
- (import [numpy [vectorize]]) 
- ((vectorize (fn [x] (get corresp (str x))))
-  (getattr (get df col) "values"))) 
-
-(defn cod [lista] (dfor [u v] (enumerate lista) [v u]))
